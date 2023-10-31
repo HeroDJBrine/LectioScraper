@@ -100,7 +100,7 @@ class Lectio:
         
         self.Session = session
 
-    def getSchedule(self, to_json: bool):
+    def getSchedule(self, to_json: bool, week: int, year: int):
         # Fix in progress !!!
         # TODO: Make this function work for teachers
         # ! If you make any changes to this function, make sure it integrates with addToGoogleCalendar function
@@ -118,6 +118,8 @@ class Lectio:
             Session=self.Session,
             SchoolId=self.SchoolId,
             to_json=to_json,
+            week=week,
+            year=year,
         )
 
     def getAbsence(self, written_assignments: bool, to_json: bool):
