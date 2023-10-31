@@ -4,9 +4,9 @@ import logging
 import json
 
 
-def get_schedule(to_json, SchoolId, Session):
+def get_schedule(to_json, week, year, SchoolId, Session):
     # Lectio doesn't need studentId anymore
-    SCHEDULE_URL = "https://www.lectio.dk/lectio/{}/SkemaNy.aspx".format(SchoolId)
+    SCHEDULE_URL = "https://www.lectio.dk/lectio/{}/SkemaNy.aspx?week={}{}".format(SchoolId, week, year)
 
     schedule = Session.get(SCHEDULE_URL)
 
