@@ -84,6 +84,8 @@ def get_schedule(to_json, week, year, SchoolId, Session):
     if to_json:
         with open('schedule.json', 'w') as fp:
             json.dump(schedule, fp, indent=4)
+    else:
+        return schedule
     
 
 
