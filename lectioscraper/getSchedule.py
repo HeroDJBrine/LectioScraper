@@ -61,9 +61,7 @@ def get_schedule(to_json, week, year, SchoolId, Session):
             result = team.split(", ")
             for team2 in result:
                 a_tag = soup.find('a', text=str(team2))
-                if a_tag is None:
-                    print("Not part of team " + team2)
-                else:
+                if a_tag is not None:
                     href_value = a_tag.get('href')
                     match = re.search(r'holdelementid=(\d+)', href_value)
                     excrated_value = ""
