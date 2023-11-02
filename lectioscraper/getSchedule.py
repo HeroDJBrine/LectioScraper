@@ -56,6 +56,49 @@ def get_schedule(to_json, week, year, SchoolId, Session):
             homework_section = sections[1] if len(sections) > 1 else ''
             note_section = sections[2] if len(sections) > 2 else ''
 
+
+
+            result = team.split(", ")
+            for team2 in result:
+                a_tag = soup.find('a', text=str(team2))
+                if a_tag is None:
+                    print("Not part of team " + team2)
+                else:
+                    href_value = a_tag.get('href')
+                    match = re.search(r'holdelementid=(\d+)', href_value)
+                    excrated_value = ""
+                    if match:
+                        extracted_value = match.group(1)
+                    else:
+                        return "ERROR: holdelementid not found"
+
+                    schedule2 = Session.get("https://www.lectio.dk/lectio/{}/subnav/members.aspx?holdelementid={}&showteachers=1&showstudents=1".format(SchoolId, extracted_value))
+                    soup2 = BeautifulSoup(schedule2.text, features="html.parser")
+                    table = soup2.find("table", id="s_m_Content_Content_laerereleverpanel_alm_gv")
+                    rows = table.findAll("tr")
+                    rows.pop(0)
+                    members = []
+                    for row in rows: #for each member
+                        memberinfo = row.findAll("td")
+                        image = memberinfo[0].find("img", title="Vis større foto")
+                        image = image.get('src')
+                        def filter_by_id(tag):
+                            return tag.has_attr('id') and 's_m_Content_Content_laerereleverpanel_alm_gv_ct' in tag['id']
+                        def check_and_append(lst, obj):
+                            for element in lst:
+                                if element == obj:
+                                    return
+                            lst.append(obj)
+                        name = memberinfo[3].find(filter_by_id)
+                        last_name = memberinfo[4].find("span", class_="noWrap")
+                        teacher_or_student = memberinfo[1]
+                        check_and_append(members, {
+                            "image": "https://lectio.dk" + str(image),
+                            "full_name": name.text + " " + last_name.text,
+                            "type": teacher_or_student.text
+                        })
+                
+
             # check if a class with the same team already exists in the schedule
             if team in skema:
                 skema[str(team) + "2"] = {
@@ -65,7 +108,8 @@ def get_schedule(to_json, week, year, SchoolId, Session):
                     "teacher": teacher,
                     "classroom": classroom,
                     "homework": homework_section.strip(),
-                    "note": note_section.strip()
+                    "note": note_section.strip(),
+                    "members": members
                 }
             
             # Print the parsed information
@@ -77,7 +121,8 @@ def get_schedule(to_json, week, year, SchoolId, Session):
                     "teacher": teacher,
                     "classroom": classroom,
                     "homework": homework_section.strip(),
-                    "note": note_section.strip()
+                    "note": note_section.strip(),
+                    "members": members
                 }
 
         schedule[dates[i]] = skema
@@ -85,10 +130,3 @@ def get_schedule(to_json, week, year, SchoolId, Session):
         with open('schedule.json', 'w') as fp:
             json.dump(schedule, fp, indent=4)
     return schedule
-    
-
-
-    
-        
-        
-        
